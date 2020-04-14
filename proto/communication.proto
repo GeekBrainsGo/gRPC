@@ -1,0 +1,82 @@
+// protoc -I proto/ proto/communication.proto --go_out=plugins=grpc:.
+
+/*
+Генерация gRPC кода:
+
+protoc -I/usr/local/include -I. \
+  -I$GOPATH/src \
+  -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+  --go_out=plugins=grpc:. \
+  proto/communication.proto
+ */
+
+/*
+Генерация HTTP Proxy:
+
+protoc -I/usr/local/include -I. \
+  -I$GOPATH/src \
+  -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+  --grpc-gateway_out=logtostderr=true:. \
+  proto/communication.proto
+ */
+
+/*
+Генерация Swagger:
+
+protoc -I/usr/local/include -I. \
+  -I$GOPATH/src \
+  -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+  --swagger_out=logtostderr=true,repeated_path_param_separator=ssv:. \
+  proto/communication.proto
+ */
+
+/*
+Генерация всего:
+
+protoc -I/usr/local/include -I. \
+  -I$GOPATH/src \
+  -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+  --go_out=plugins=grpc:. \
+  --grpc-gateway_out=logtostderr=true:. \
+  --swagger_out=logtostderr=true,repeated_path_param_separator=ssv:. \
+  proto/communication.proto
+ */
+
+syntax = "proto3";
+option go_package = "proto/;communication_proto";
+package proto;
+
+import "google/api/annotations.proto";
+
+service Demo {
+  // curl localhost:8080/v1/server-info
+
+  // Краткое описание
+  rpc ServerInfo(EmptyRequest) returns (InfoReply) {
+    option (google.api.http) = {
+      get: "/v1/server-info"
+    };
+  }
+
+  // curl -XPOST localhost:8080/v1/echo/5 -d '{"data":["1", "2"]}'
+
+  // Здесь тоже краткое описание
+  //
+  // А здесь уже большое и полное описание
+  rpc Echo(EchoRequestReply) returns (EchoRequestReply) {
+    option (google.api.http) = {
+      post: "/v1/echo/{id}"
+      body: "*"
+    };
+  }
+}
+
+message EmptyRequest {}
+message InfoReply {
+  string info = 1;
+}
+
+message EchoRequestReply {
+  string id = 1;
+  repeated string data = 2;
+}
